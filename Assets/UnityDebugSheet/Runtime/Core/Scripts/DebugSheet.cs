@@ -22,7 +22,8 @@ namespace UnityDebugSheet.Runtime.Core.Scripts
 
         [SerializeField] private bool _singleton = true;
 
-        [FormerlySerializedAs("_globalControlMode")] [SerializeField]
+        [FormerlySerializedAs("_globalControlMode")]
+        [SerializeField]
         private FlickToOpenMode _flickToOpen = FlickToOpenMode.Edge;
 
         [SerializeField] private ClickToOpenMode _clickToOpen = ClickToOpenMode.Off;
@@ -36,7 +37,7 @@ namespace UnityDebugSheet.Runtime.Core.Scripts
         [SerializeField] private Text _enterTitleText;
         [SerializeField] private Button _closeButton;
         [SerializeField] private PageContainer _pageContainer;
-        [SerializeField] [HideInInspector] private GameObject _pagePrefab;
+        [SerializeField][HideInInspector] private GameObject _pagePrefab;
         [SerializeField] private InputBasedFlickEvent _flickEvent;
         [SerializeField] private BalloonButton _balloonButton;
         [SerializeField] private FloatingButton _floatingButton;
@@ -428,6 +429,11 @@ namespace UnityDebugSheet.Runtime.Core.Scripts
 
             var state = _drawer.GetNearestState() == DrawerState.Max ? DrawerState.Min : DrawerState.Max;
             _drawerController.SetStateWithAnimation(state);
+        }
+
+        public void SetOnDrawStateChanged(Action<DrawerState> action)
+        {
+            _drawerController.OnDrawStateChanged += action;
         }
     }
 }

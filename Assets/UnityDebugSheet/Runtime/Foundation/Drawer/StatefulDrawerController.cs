@@ -16,7 +16,7 @@ namespace UnityDebugSheet.Runtime.Foundation.Drawer
             Dragging,
             Animation
         }
-        
+
         private const int MaxPositionListSize = 3;
         private const float FlickDistanceThresholdInchPerSec = 0.025f;
 
@@ -47,7 +47,8 @@ namespace UnityDebugSheet.Runtime.Foundation.Drawer
         }
 
         public event Action<DrawerResizingState> OnResizingStateChanged;
-        
+        public event Action<DrawerState> OnDrawStateChanged;
+
         private void Start()
         {
             _drawer = GetComponent<StatefulDrawer>();
@@ -68,7 +69,7 @@ namespace UnityDebugSheet.Runtime.Foundation.Drawer
                 return;
 
             _pointerId = eventData.pointerId;
-            
+
             _dragPositions.Clear();
 
             ResizingState = DrawerResizingState.Dragging;
@@ -79,7 +80,7 @@ namespace UnityDebugSheet.Runtime.Foundation.Drawer
             // If it is the event of another finger , ignore it.
             if (eventData.pointerId != _pointerId)
                 return;
-            
+
             var deltaScreenPos = eventData.delta;
             var deltaPos = deltaScreenPos / _canvas.scaleFactor;
             if (_drawer.IsInAnimation)
@@ -106,7 +107,7 @@ namespace UnityDebugSheet.Runtime.Foundation.Drawer
                 return;
 
             _pointerId = -1;
-            
+
             if (_drawer.IsInAnimation)
                 _drawer.StopProgressAnimation();
 
@@ -149,7 +150,7 @@ namespace UnityDebugSheet.Runtime.Foundation.Drawer
             // Transition to the upper or lower state if flick direction is same as drawer direction.
             var drawerDirectionIsInversed = _drawer.Direction == DrawerDirection.RightToLeft
                                             || _drawer.Direction == DrawerDirection.TopToBottom;
-            
+
             var positiveTransition = drawerDirectionIsInversed ? !positiveFlick : positiveFlick;
             var targetState = positiveTransition ? _drawer.GetUpperState() : _drawer.GetLowerState();
             SetStateWithAnimation(targetState);
@@ -163,6 +164,8 @@ namespace UnityDebugSheet.Runtime.Foundation.Drawer
             ResizingState = DrawerResizingState.Animation;
             _drawer.SetStateWithAnimation(state, _animationDuration, _animationType,
                 () => ResizingState = DrawerResizingState.None);
+
+            OnDrawStateChanged?.Invoke(state);
         }
     }
 }
